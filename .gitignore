@@ -1,3 +1,11 @@
+# Perso
+bin/*
+build/
+tmp/*
+.vscode/
+.mypy_cache/
+helets.code-workspace
+
 # Prerequisites
 *.d
 
