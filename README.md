@@ -43,9 +43,12 @@ To give a quick overview of what **helets** looks like, here are some examples:
 * `int`       integer numbers
 * `float`     decimal numbers
 * `bool`      boolean values, true or false
-* `str`       strings
+* `char`      single char (with utf-8 support), enclosed in single quotes 'a'
+* `str`       strings (with utf-8 support), enclosed in double quotes "string..."
 * `int[]`     arrays, here an integer array
-* `int[str]`  associative array, here with integer keys and string values
+* `str[float]`  associative array, here with string keys and float values
+* `void`      C/C++ void type
+* `nil`       equivalent to `null`
 ```
 
 #### Variables, declaration and assignment
@@ -66,6 +69,8 @@ str my_string: "Hello, world!\n"
 // Arrays
 int[] int_array: {10, 20, 30} // accessed withe subscript operator: int_array[0]
 str[int] asso_array: {"item0": 0, "item1": 1, "item2": 2} // access: asso_array["item2"] or asso_array[0] works as well; more sophisticated array types will have `array.key(0) or array.key("item"), and also array.items() for iteration by key, value
+
+nil|int z: nil ?? 100 // Unions, for optional types; and null coalescing operator
 
 // Constants
 const int const_int: 50
@@ -131,6 +136,22 @@ x: 10
 y: 0
 for i in 0..x:
     y +: i // equivalent to y: y + i
+
+for int i: 0; i < 1_000_000; i++:
+    std::print(f"Value of i: {i} ")
+std::print('\n')
+
+for const int& i in std::range(0, 1000):
+    i +: 100
+
+str[int] asso_array: {'a': true, 'b': false, 'c': true, 'd': false}
+for const& [char key, bool val] in assoc_array:
+    std::print(f"key: {key}, value: {val}\n")
+
+while true:
+    x++
+    if x = 10:
+        break
 ```
 
 #### Functions
@@ -142,6 +163,20 @@ int my_func(int a, int b = 5):
     // Parameters can be accessed by names or by `$n`
     // `$0` is the function, or `this` object; params follow: `$1, $2, ...`
     return $0 // return `this`
+
+// Union for optional types
+int|char another_func(char c):
+    if c = 'a': // or `if $1 = 'a': ...`
+        return 10
+
+    return 'b'
+
+?int opt_func(int x)
+    return nil ?? x
+
+void vfunc(int|bool y, int|bool y): // optional types
+    if x =~ y: // type comparison (see above)
+        std::print("x and y have the same type")
 ```
 
 #### Classes
@@ -198,6 +233,8 @@ int main(int argc, char## argv):
 
     if my_int != mcls.get_x():
         return std::exit_failure
+
+    int|nil n: mcls.?get_x() // optional chaining operator
 
     return std::exit_success
 ```
