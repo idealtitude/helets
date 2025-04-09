@@ -7,12 +7,13 @@ BISON = bison
 SRC_DIR = src
 BUILD_DIR = build
 BIN_DIR = bin
+VERSION = 0.0.7
 
 # Create directories if they don't exist
 $(shell mkdir -p $(BUILD_DIR) $(BIN_DIR))
 
 # Target executable
-TARGET = $(BIN_DIR)/helets
+TARGET = $(BIN_DIR)/helets-$(VERSION)
 
 # Source files
 SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/AST.cpp
