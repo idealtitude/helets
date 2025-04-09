@@ -64,7 +64,8 @@ bool my_bool: true
 str my_string: "Hello, world!\n"
 
 // Arrays
-int[] int_array: {10, 20, 30}
+int[] int_array: {10, 20, 30} // accessed withe subscript operator: int_array[0]
+str[int] asso_array: {"item0": 0, "item1": 1, "item2": 2} // access: asso_array["item2"] or asso_array[0] works as well; more sophisticated array types will have `array.key(0) or array.key("item"), and also array.items() for iteration by key, value
 
 // Constants
 const int const_int: 50
@@ -118,16 +119,18 @@ else:
 
 // match case
 match x:
-    x >= 5
+    x >= 5:
         x: 15
+    x <= 5:
+        x: 1
     _
-        x: 10
+        x: 10 // default case
 
 // for loop
 x: 10
 y: 0
 for i in 0..x:
-    y:+ i // equivalent to y: y + i
+    y +: i // equivalent to y: y + i
 ```
 
 #### Functions
@@ -138,6 +141,7 @@ Functions are objects! So they have a `this` accessor.
 int my_func(int a, int b = 5):
     // Parameters can be accessed by names or by `$n`
     // `$0` is the function, or `this` object; params follow: `$1, $2, ...`
+    return $0 // return `this`
 ```
 
 #### Classes
@@ -145,6 +149,7 @@ int my_func(int a, int b = 5):
 I plan to create an `import` system, to make the declaration and implementation of classes.
 
 ```hlts
+// ./mylib/my_class.hlts (see next example for import)
 import <iostream>
 export MyClass
 
@@ -152,11 +157,12 @@ export MyClass
 // use of namespaces, templates, are part of the language (not shown here)
 class MyClass:
     public
-
     // Constructors
     MyClass(): delete
-    MyClass(int x):
+    MyClass(int x, int y):
         this.x: x
+        this.y: y
+        this.z: x + y
 
     // Destructor
     ~MyClass(): default
@@ -168,6 +174,8 @@ class MyClass:
          std::print(f"Value of x: {x}") // Python-like "f string"
 
     private
+    int y
+    int z
     int get_x() const:
         return this.x
 ```
@@ -176,11 +184,20 @@ class MyClass:
 
 ```hlts
 import <iostream>
-from "./my_lib/my_class.hlts" import MyClass as MCls
+from mylib.my_class import MyClass as MCls
+
+template<typename T>
+T add_numbers(const T& x, const T& y):
+    return x + y
 
 int main(int argc, char## argv):
     MCls mcls(86)
     mcls.print_x()
+
+    int my_int: add_numbers<int>(100, 200)
+
+    if my_int != mcls.get_x():
+        return std::exit_failure
 
     return std::exit_success
 ```
