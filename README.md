@@ -12,7 +12,7 @@ The helets programming language
 
 That's what **helets** would like to be, ideally, that smaller and cleaner language; but it's a giganormous and very difficult goal to reach.
 So as a step forward the vision of what I'd want `helets` to be, I'm starting very simple, with the bases for the specifications, etc..
-Basically, from C/C++, and some features from others of my favourite languages, like Python (etc.), I try to "extract" that smaller and cleaner language, at least partially.
+Basically, from C/C++, and some features from other of my favourite languages, like Python (etc.), I try to "extract" that smaller and cleaner language, at least partially.
 
 For the implementation, I want it to be a compiled language, that's why I plan to use LLVM later on.
 
@@ -33,12 +33,12 @@ In summary:
 
 I have more to say about the design, syntax, and features of the language; for the moment I'm still struggling to define a comprehensive specifications list.
 
-But, right now you can compile and try the **helets** files in the [examples dolder](https://github.com/idealtitude/helets/tree/main/examples), their extension is `hlt`, they are just simple plain text files.
+But, right now you can compile and try the **helets** files in the [examples dolder](https://github.com/idealtitude/helets/tree/main/examples), their extension is `hlts`, they are just simple plain text files.
 
 To give a quick overview of what **helets** looks like, here are some examples:
 
 #### Variables, declaration and assignment
-```hlt
+```hlts
 // Integer
 int my_int: 105
 
@@ -73,7 +73,7 @@ print(y_ref) // outputs 3.14
 
 #### Loops, control structures
 
-```hlt
+```hlts
 // if elif else
 if x >= 5:
     x: 15
@@ -98,7 +98,7 @@ for i in 0..x:
 
 #### Functions
 
-```hlt
+```hlts
 int my_func(int a, int b = 5):
     // Parameters can be accessed by names or by `$n`
     // `$0` is the function, or `this` object; params follow: `$1, $2, ...`
@@ -106,7 +106,7 @@ int my_func(int a, int b = 5):
 
 #### Classes
 
-```hlt
+```hlts
 // Basic class declaration
 class MyClass:
     public
