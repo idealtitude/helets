@@ -6,4 +6,6 @@
         <path d="M512 128v319.54l-384-1.388v128.08l384 1.327V896h128V128Z" style="fill:#fff;fill-opacity:1;stroke:#717171;stroke-width:32;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" transform="translate(81.92 -61.44)scale(1.12)"/>
         <path d="M128 128v768h128V128Z" style="fill:#717171;fill-opacity:1;stroke:#717171;stroke-width:32;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1" transform="translate(81.92 -61.44)scale(1.12)"/>
     </g>
+    <circle cx="512" cy="301.75" r="64" style="fill:#fff;stroke:#717171;stroke-width:32;stroke-linecap:round;stroke-linejoin:round;fill-opacity:1;stroke-opacity:1"/>
+    <circle cx="512" cy="719.993" r="64" style="fill:#717171;stroke:#717171;stroke-width:32;stroke-linecap:round;stroke-linejoin:round"/>
 </svg>
