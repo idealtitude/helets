@@ -184,7 +184,9 @@ int|char another_func(char c):
     return nil ?? x  // Null coallescent operator
 
 int opt_func(?int x) // Optional type argument, in this case either `int` or `nil`
-    return nil ?? x  // Null coallescent operator
+    if x =~ null:  // Type comparison (`=~`)
+        return 10
+    return x
 
 void vfunc(int|bool y, int|bool y): // variant types
     if x =~ y: // type comparison (see above)
