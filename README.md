@@ -91,12 +91,12 @@ The logical, comparison, bitwise, etc, are the classical set of operators, commo
 // equal
 =  // comparison operator, by value
 == // Comparison by value and by type
-=: // Comparison by type only
+=~ // Comparison by type only
 
 // not equal
 !=  // same, by value
 !== // by value and by type
-!=: // by type only
+!=~ // by type only
 
 :  // assignment operator, as previously explained above
 +: // equivalent to ` x: x + y
