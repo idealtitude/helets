@@ -98,6 +98,8 @@ for i in 0..x:
 
 #### Functions
 
+Functions are objects! So they have a `this` accessor.
+
 ```hlts
 int my_func(int a, int b = 5):
     // Parameters can be accessed by names or by `$n`
@@ -106,20 +108,51 @@ int my_func(int a, int b = 5):
 
 #### Classes
 
+I plan to create an `import` system, to make the declaration and implementation of classes.
+
 ```hlts
-// Basic class declaration
+import <iostream>
+export MyClass
+
+// Basic class declaration and implementation (no separation!)
+// use of namespaces, templates, are part of the language (not shown here)
 class MyClass:
     public
-    int x
-    MyClass(int x): // implicit `this` parameter
+
+    // Constructors
+    MyClass(): delete
+    MyClass(int x):
         this.x: x
 
+    // Destructor
+    ~MyClass(): default
+
+    int x // public attribute
+
+    // public method
+    void print_x():
+         std::print(f"Value of x: {x}") // Python-like "f string"
+
     private
-    int get_x():
+    int get_x() const:
+        return this.x
+```
+
+### Basic program
+
+```hlts
+import <iostream>
+from "./my_lib/my_class.hlts" import MyClass as MCls
+
+int main(int argc, char## argv):
+    MCls mcls(86)
+    mcls.print_x()
+
+    return std::exit_success
 ```
 
 
-Of course in its time it will need a standard libray. So, the list of TODO's is slowly going to become more and more rich. And speaking of that, if you like the **helets** project, and if you're interested in contributing, just let me known!
+Of course in its time it will need a standard libray as shown in the example above. So, the list of TODO's is slowly going to become more and more rich. And speaking of that, if you like the **helets** project, and if you're interested in contributing, just let me known!
 
 -----------------
 
