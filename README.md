@@ -63,6 +63,9 @@ double my_double: 115.0011547856
 // Boolean
 bool my_bool: true
 
+// Single character
+char my_char: 'a'
+
 // String
 str my_string: "Hello, world!\n"
 
@@ -77,15 +80,19 @@ const int const_int: 50
 
 // Pointers, the `@` operator returns the adress of a variable
 int x: 10
-int# x_ptr: @x
+int# int_ptr: @x // int pointer, marked with `#`
+const int# cint_ptr: @x // pointer to a constant integer
+const# int int_cptr: // Constant pointer to an integer
+const# const int cint_cptr: // Constant pointer to a constant integer
 
 // Indirection operator, returns the value pointed by the pointer
 print(#x_ptr)
 
 // References
 float y: 3.14
-float& y_ref: y
+float@ y_ref: y
 print(y_ref) // outputs 3.14
+const@ float cref_float: @y
 ```
 
 #### Operators
@@ -141,11 +148,13 @@ for int i: 0; i < 1_000_000; i++:
     std::print(f"Value of i: {i} ")
 std::print('\n')
 
-for const int& i in std::range(0, 1000):
+std::range(0, 1000) my_range
+
+for const@ int i in my_range: // const reference on an integer
     i +: 100
 
 str[int] asso_array: {'a': true, 'b': false, 'c': true, 'd': false}
-for const& [char key, bool val] in assoc_array:
+for const@ [char key, bool val] in assoc_array:
     std::print(f"key: {key}, value: {val}\n")
 
 while true:
@@ -159,22 +168,25 @@ while true:
 Functions are objects! So they have a `this` accessor.
 
 ```hlts
-int my_func(int a, int b = 5):
+int my_func(int a, int b: 5): // ba has default value
     // Parameters can be accessed by names or by `$n`
     // `$0` is the function, or `this` object; params follow: `$1, $2, ...`
     return $0 // return `this`
 
-// Union for optional types
+// Union for variant types
 int|char another_func(char c):
     if c = 'a': // or `if $1 = 'a': ...`
         return 10
 
     return 'b'
 
-?int opt_func(int x)
-    return nil ?? x
+?int opt_func(int x) // Optional return type, in this case either `int` or `nil`
+    return nil ?? x  // Null coallescent operator
 
-void vfunc(int|bool y, int|bool y): // optional types
+int opt_func(?int x) // Optional type argument, in this case either `int` or `nil`
+    return nil ?? x  // Null coallescent operator
+
+void vfunc(int|bool y, int|bool y): // variant types
     if x =~ y: // type comparison (see above)
         std::print("x and y have the same type")
 ```
@@ -208,11 +220,12 @@ class MyClass:
     void print_x():
          std::print(f"Value of x: {x}") // Python-like "f string"
 
+    int get_x() const:
+        return this.x
+
     private
     int y
     int z
-    int get_x() const:
-        return this.x
 ```
 
 ### Basic program
@@ -222,7 +235,7 @@ import <iostream>
 from mylib.my_class import MyClass as MCls
 
 template<typename T>
-T add_numbers(const T& x, const T& y):
+T add_numbers(const@ T x, const@ T y): // constant references
     return x + y
 
 int main(int argc, char## argv):
