@@ -37,6 +37,17 @@ But, right now you can compile and try the **helets** files in the [examples dol
 
 To give a quick overview of what **helets** looks like, here are some examples:
 
+#### Basic types
+
+```
+* `int`       integer numbers
+* `float`     decimal numbers
+* `bool`      boolean values, true or false
+* `str`       strings
+* `int[]`     arrays, here an integer array
+* `int[str]`  associative array, here with integer keys and string values
+```
+
 #### Variables, declaration and assignment
 ```hlts
 // Integer
@@ -69,6 +80,29 @@ print(#x_ptr)
 float y: 3.14
 float& y_ref: y
 print(y_ref) // outputs 3.14
+```
+
+#### Operators
+
+The logical, comparison, bitwise, etc, are the classical set of operators, common to many languages, with the following notable differences:
+
+```hlts
+// equal
+=  // comparison operator, by value
+== // Comparison by value and by type
+=: // Comparison by type only
+
+// not equal
+!=  // same, by value
+!== // by value and by type
+!=: // by type only
+
+:  // assignment operator, as previously explained above
++: // equivalent to ` x: x + y
+-: // idem
+&: // idem
+^: // idem
+// etc.
 ```
 
 #### Loops, control structures
