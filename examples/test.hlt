@@ -1,0 +1,11 @@
+// Integer
+int my_int: 105
+
+// Float
+float my_float: 0.514
+
+// Boolean
+bool my_bool: true
+
+// String
+str my_string: "Shalom shamayim!"

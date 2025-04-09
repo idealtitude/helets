@@ -1,74 +1,80 @@
 %{
 #include <iostream>
 #include <string>
-#include <cstdlib>
+#include "AST.hpp"
 
-#define MAX_IDENTIFIER_LENGTH 32
-
-// Use std::string for identifiers
-typedef union {
-    int number;
-    char string[MAX_IDENTIFIER_LENGTH]; // Still needed for yylval.string (Flex limitation)
-    std::string identifier;        // More C++ like
-} YYSTYPE;
-
-// Use C++ iostream for error reporting
-void yyerror(const char *s);
-
-// Declare external C functions
 extern int yylex();
-extern char *yytext;
+extern int yylineno;
+extern FILE* yyin;
 
+void yyerror(const char* s);
+
+// Root of the AST
+ProgramNode* program = new ProgramNode();
 %}
 
-%token NUMBER
-%token IDENTIFIER
-%token PLUS MINUS TIMES DIVIDE
-%token LPAREN RPAREN
-%token SEMICOLON
+%union {
+    int int_val;
+    float float_val;
+    bool bool_val;
+    char* str_val;
+    ExprNode* expr;
+    StmtNode* stmt;
+    VarDeclNode* var_decl;
+}
 
-%left PLUS MINUS
-%left TIMES DIVIDE
+%token <int_val> INT_LIT
+%token <float_val> FLOAT_LIT
+%token <bool_val> BOOL_LIT
+%token <str_val> STR_LIT
+%token <str_val> IDENTIFIER
+%token TYPE_INT TYPE_FLOAT TYPE_BOOL TYPE_STR
+%token COLON NEWLINE
+
+%type <expr> expr
+%type <stmt> statement
+%type <var_decl> var_declaration
+
+// Define operator precedence (lower = higher precedence)
+%left '+' '-'
+%left '*' '/'
 
 %%
-
 program:
-    statement_list
-    ;
-
-statement_list:
-    statement
-    | statement_list statement
+    statement               { program->addStatement($1); }
+    | program statement     { program->addStatement($2); }
     ;
 
 statement:
-    expression SEMICOLON
-    { std::cout << "Result: " << $1 << std::endl; }
+    var_declaration NEWLINE  { $$ = $1; }
+    | NEWLINE               { $$ = nullptr; }
     ;
 
-expression:
-    expression PLUS expression   { $$ = $1 + $3; }
-    | expression MINUS expression  { $$ = $1 - $3; }
-    | expression TIMES expression  { $$ = $1 * $3; }
-    | expression DIVIDE expression {
-                                    if ($3 == 0) {
-                                        yyerror("Division by zero");
-                                        exit(1);
-                                    }
-                                    $$ = $1 / $3;
-                                  }
-    | LPAREN expression RPAREN   { $$ = $2; }
-    | NUMBER                    { $$ = $1; }
-    | IDENTIFIER                { /* Handle identifier lookup/value retrieval here */ $$ = 0; } // Placeholder
+var_declaration:
+    TYPE_INT IDENTIFIER COLON expr     { $$ = new VarDeclNode(DataType::INT, $2, $4); }
+    | TYPE_FLOAT IDENTIFIER COLON expr { $$ = new VarDeclNode(DataType::FLOAT, $2, $4); }
+    | TYPE_BOOL IDENTIFIER COLON expr  { $$ = new VarDeclNode(DataType::BOOL, $2, $4); }
+    | TYPE_STR IDENTIFIER COLON expr   { $$ = new VarDeclNode(DataType::STRING, $2, $4); }
+    ;
+
+expr:
+    INT_LIT     { $$ = new IntLiteralNode($1); }
+    | FLOAT_LIT { $$ = new FloatLiteralNode($1); }
+    | BOOL_LIT  { $$ = new BoolLiteralNode($1); }
+    | STR_LIT   { $$ = new StringLiteralNode($1); }
+    | expr '+' expr { $$ = new BinaryOpNode(OpType::ADD, $1, $3); }
+    | expr '-' expr { $$ = new BinaryOpNode(OpType::SUB, $1, $3); }
+    | expr '*' expr { $$ = new BinaryOpNode(OpType::MUL, $1, $3); }
+    | expr '/' expr { $$ = new BinaryOpNode(OpType::DIV, $1, $3); }
+    | '(' expr ')'  { $$ = $2; }
     ;
 
 %%
 
-void yyerror(const char *s) {
-    std::cerr << "Error: " << s << " near '" << yytext << "'" << std::endl;
+void yyerror(const char* s) {
+    std::cerr << "Parse error at line " << yylineno << ": " << s << std::endl;
 }
 
-int main() {
-    yyparse();
-    return 0;
+ProgramNode* getProgram() {
+    return program;
 }

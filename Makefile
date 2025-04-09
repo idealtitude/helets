@@ -1,50 +1,50 @@
-CXX=clang++
-CXXFLAGS=-std=c++20 -g -O0 -W -Wall -Werror -Wextra -Wshadow -pthread -Wno-sign-compare -Wconversion -Wno-unused-function -Wpedantic -pedantic -pedantic-errors
-LDFLAGS=
+CXX = clang++
+CXXFLAGS = -std=c++20 -Wall -Wextra -g -I./src
+FLEX = flex
+BISON = bison
 
-BINNAME=helets-0.0.1
-BINDIR=bin
-SRCDIR=src
-OBJDIR=build
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+BIN_DIR = bin
 
-LEXER_SRC=$(SRCDIR)/lexer.l
-PARSER_SRC=$(SRCDIR)/parser.y
-MAIN_SRC=$(SRCDIR)/main.cpp
+# Create directories if they don't exist
+$(shell mkdir -p $(BUILD_DIR) $(BIN_DIR))
 
-LEXER_OBJ=$(OBJDIR)/lexer.o
-PARSER_OBJ=$(OBJDIR)/parser.o
-MAIN_OBJ=$(OBJDIR)/main.o
+# Target executable
+TARGET = $(BIN_DIR)/helets
 
-OBJS=$(LEXER_OBJ) $(PARSER_OBJ) $(MAIN_OBJ)
+# Source files
+SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/AST.cpp
+OBJS = $(BUILD_DIR)/lex.yy.o $(BUILD_DIR)/parser.tab.o $(BUILD_DIR)/main.o $(BUILD_DIR)/AST.o
 
-BIN=$(BINDIR)/$(BINNAME)
+all: $(TARGET)
 
-all: $(BIN)
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-release: CXXFLAGS=-std=c++20 -Wall -O2 -DNDEBUG
-release: clean
-release: $(BIN)
+$(BUILD_DIR)/lex.yy.o: $(BUILD_DIR)/lex.yy.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(BIN): $(OBJS) $(OBJDIR) # Add OBJDIR as a dependency
- 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+$(BUILD_DIR)/parser.tab.o: $(BUILD_DIR)/parser.tab.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(LEXER_OBJ): $(LEXER_SRC) $(OBJDIR) # Add OBJDIR as a dependency
-	flex $(LEXER_SRC)
-	$(CXX) $(CXXFLAGS) -c lexer.c -o $@ # lexer.c is created in the current directory
+$(BUILD_DIR)/lex.yy.cpp: $(SRC_DIR)/lexer.l $(BUILD_DIR)/parser.tab.hpp
+	$(FLEX) -o $@ $<
 
-$(PARSER_OBJ): $(PARSER_SRC) $(OBJDIR) # Add OBJDIR as a dependency
-	bison -d $(PARSER_SRC)
-	$(CXX) $(CXXFLAGS) -c parser.tab.c -o $@ # parser.tab.c is created in the current directory
+$(BUILD_DIR)/parser.tab.cpp $(BUILD_DIR)/parser.tab.hpp: $(SRC_DIR)/parser.y
+	$(BISON) -d -o $(BUILD_DIR)/parser.tab.cpp $<
 
-$(MAIN_OBJ): $(MAIN_SRC) $(OBJDIR) # Add OBJDIR as a dependency
-	$(CXX) $(CXXFLAGS) -c $(MAIN_SRC) -o $@
+$(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJDIR): # Rule to create the object directory
-	mkdir -p $@
+$(BUILD_DIR)/AST.o: $(SRC_DIR)/AST.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	$(RM) -r $(OBJDIR) lexer.c parser.tab.c parser.tab.h
+	rm -rf $(BUILD_DIR)
 
-cleanall:
-	$(RM) -r $(OBJDIR) lexer.c parser.tab.c parser.tab.h
-	$(RM) -r $(BINDIR)/*
+cleanall: clean
+	rm -rf $(TARGET)
+
+.PHONY: all clean cleanall
