@@ -119,7 +119,7 @@ class MyClass:
 ```
 
 
-Of course in its time it will need a standard libray.
+Of course in its time it will need a standard libray. So, the list of TODO's is slowly going to become more and more rich. And speaking of that, if you like the **helets** project, and if you're interested in contributing, just let me known!
 
 -----------------
 
