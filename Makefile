@@ -7,7 +7,7 @@ BISON = bison
 SRC_DIR = src
 BUILD_DIR = build
 BIN_DIR = bin
-VERSION = 0.0.7
+VERSION=$(shell cat ./VERSION)
 
 # Create directories if they don't exist
 $(shell mkdir -p $(BUILD_DIR) $(BIN_DIR))

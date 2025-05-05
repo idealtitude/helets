@@ -20,7 +20,13 @@ enum class OpType
     ADD,
     SUB,
     MUL,
-    DIV
+    DIV,
+    VAL_EQ,  // =
+    VAL_NEQ, // !=
+    GT,  // >
+    GTE, // >=
+    LT,  // <
+    LTE  // <=
 };
 
 // Forward declarations
@@ -158,6 +164,38 @@ public:
     const char* value;
 };
 
+// Identifier node (for variable references)
+class IdentifierNode : public ExprNode
+{
+public:
+    IdentifierNode(const char* name) : name(name) {}
+    ~IdentifierNode()
+    {
+        free(const_cast<char*>(name));
+    }
+
+    void print(int indent = 0) const override
+    {
+        printIndent(indent);
+        std::cout << "Identifier: " << name << std::endl;
+    }
+
+    DataType getType() const override
+    {
+        // In a real implementation, we would look up the identifier's type
+        // For now, default to INT
+        return DataType::INT;
+    }
+
+    const char* getName() const
+    {
+        return name;
+    }
+
+private:
+    const char* name;
+};
+
 // Binary operation node (for arithmetic operations)
 class BinaryOpNode : public ExprNode
 {
@@ -180,6 +218,12 @@ class BinaryOpNode : public ExprNode
             case OpType::SUB: std::cout << "-"; break;
             case OpType::MUL: std::cout << "*"; break;
             case OpType::DIV: std::cout << "/"; break;
+            case OpType::VAL_EQ: std::cout << "="; break;
+            case OpType::VAL_NEQ: std::cout << "!="; break;
+            case OpType::GT: std::cout << ">"; break;
+            case OpType::GTE: std::cout << ">="; break;
+            case OpType::LT: std::cout << "<"; break;
+            case OpType::LTE: std::cout << "<="; break;
         }
         std::cout << std::endl;
 
@@ -194,8 +238,20 @@ class BinaryOpNode : public ExprNode
 
     DataType getType() const override
 	{
-        // For now, simple type determination
-        // In a more advanced implementation, we'd check both operands
+        // For comparison operators, the result is always boolean
+        switch (op) {
+            case OpType::VAL_EQ:
+            case OpType::VAL_NEQ:
+            case OpType::GT:
+            case OpType::GTE:
+            case OpType::LT:
+            case OpType::LTE:
+                return DataType::BOOL;
+            default:
+                break;
+        }
+
+        // For arithmetic operators:
         DataType leftType = left->getType();
         DataType rightType = right->getType();
 
@@ -288,6 +344,66 @@ public:
     DataType type;
     const char* name;
     ExprNode* value;
+};
+
+// If statement node
+class IfStmtNode : public StmtNode
+{
+public:
+    IfStmtNode(ExprNode* condition, StmtNode* thenBranch, StmtNode* elseBranch)
+        : condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+
+    ~IfStmtNode()
+    {
+        delete condition;
+        delete thenBranch;
+        delete elseBranch;
+    }
+
+    void print(int indent = 0) const override
+    {
+        printIndent(indent);
+        std::cout << "IfStmt:" << std::endl;
+
+        printIndent(indent);
+        std::cout << "Condition:" << std::endl;
+        condition->print(indent + 1);
+
+        printIndent(indent);
+        std::cout << "Then:" << std::endl;
+        if (thenBranch) {
+            thenBranch->print(indent + 1);
+        } else {
+            printIndent(indent + 1);
+            std::cout << "<empty>" << std::endl;
+        }
+
+        if (elseBranch) {
+            printIndent(indent);
+            std::cout << "Else:" << std::endl;
+            elseBranch->print(indent + 1);
+        }
+    }
+
+    ExprNode* getCondition() const
+    {
+        return condition;
+    }
+
+    StmtNode* getThenBranch() const
+    {
+        return thenBranch;
+    }
+
+    StmtNode* getElseBranch() const
+    {
+        return elseBranch;
+    }
+
+private:
+    ExprNode* condition;
+    StmtNode* thenBranch;
+    StmtNode* elseBranch;
 };
 
 // Program node (root of the AST)

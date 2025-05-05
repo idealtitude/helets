@@ -22,6 +22,9 @@ extern int yylineno;
 "bool"          { return TYPE_BOOL; }
 "str"           { return TYPE_STR; }
 
+"if"            { return IF; }
+"else"          { return ELSE; }
+
 "true"          { yylval.bool_val = true; return BOOL_LIT; }
 "false"         { yylval.bool_val = false; return BOOL_LIT; }
 
@@ -32,17 +35,24 @@ extern int yylineno;
 "*"             { return '*'; }
 "/"             { return '/'; }
 
+"="             { return VAL_EQ; }
+"!="            { return VAL_NEQ; }
+">"             { return GT; }
+">="            { return GTE; }
+"<"             { return LT; }
+"<="            { return LTE; }
+
 "("             { return '('; }
 ")"             { return ')'; }
 
-[0-9]+          { 
-                  yylval.int_val = std::stoi(yytext); 
-                  return INT_LIT; 
+[0-9]+          {
+                  yylval.int_val = std::stoi(yytext);
+                  return INT_LIT;
                 }
 
-[0-9]+\.[0-9]+  { 
-                  yylval.float_val = std::stof(yytext); 
-                  return FLOAT_LIT; 
+[0-9]+\.[0-9]+  {
+                  yylval.float_val = std::stof(yytext);
+                  return FLOAT_LIT;
                 }
 
 \"[^\"]*\"      {
