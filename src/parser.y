@@ -32,15 +32,15 @@ ProgramNode* program = new ProgramNode();
 %token TYPE_INT TYPE_FLOAT TYPE_BOOL TYPE_STR
 %token COLON NEWLINE
 %token IF ELSE
-%token VAL_EQ VAL_NEQ GT GTE LT LTE
+%token EQ NEQ GT GTE LT LTE
 
 %type <expr> expr condition
-%type <stmt> statement
+%type <stmt> statement block_statement
 %type <var_decl> var_declaration
 %type <if_stmt> if_statement
 
 // Define operator precedence (lower = higher precedence)
-%left VAL_EQ VAL_NEQ
+%left EQ NEQ
 %left GT GTE LT LTE
 %left '+' '-'
 %left '*' '/'
@@ -57,16 +57,23 @@ statement:
     | NEWLINE               { $$ = nullptr; }
     ;
 
+block_statement:
+    var_declaration NEWLINE  { $$ = $1; }
+    ;
+
 var_declaration:
     TYPE_INT IDENTIFIER COLON expr     { $$ = new VarDeclNode(DataType::INT, $2, $4); }
     | TYPE_FLOAT IDENTIFIER COLON expr { $$ = new VarDeclNode(DataType::FLOAT, $2, $4); }
     | TYPE_BOOL IDENTIFIER COLON expr  { $$ = new VarDeclNode(DataType::BOOL, $2, $4); }
     | TYPE_STR IDENTIFIER COLON expr   { $$ = new VarDeclNode(DataType::STRING, $2, $4); }
+    | IDENTIFIER COLON expr            { $$ = new VarDeclNode(DataType::INT, $1, $3); } // For assignments in if/else blocks
     ;
 
 if_statement:
-    IF condition COLON NEWLINE statement     { $$ = new IfStmtNode($2, $4, nullptr); }
-    | IF condition COLON NEWLINE statement ELSE COLON NEWLINE statement { $$ = new IfStmtNode($2, $4, $7); }
+    IF '(' condition ')' COLON NEWLINE block_statement
+        { $$ = new IfStmtNode($3, $7, nullptr); }
+    | IF '(' condition ')' COLON NEWLINE block_statement ELSE COLON NEWLINE block_statement
+        { $$ = new IfStmtNode($3, $7, $11); }
     ;
 
 condition:
@@ -83,8 +90,8 @@ expr:
     | expr '-' expr { $$ = new BinaryOpNode(OpType::SUB, $1, $3); }
     | expr '*' expr { $$ = new BinaryOpNode(OpType::MUL, $1, $3); }
     | expr '/' expr { $$ = new BinaryOpNode(OpType::DIV, $1, $3); }
-    | expr VAL_EQ expr  { $$ = new BinaryOpNode(OpType::VAL_EQ, $1, $3); }
-    | expr VAL_NEQ expr { $$ = new BinaryOpNode(OpType::VAL_NEQ, $1, $3); }
+    | expr EQ expr  { $$ = new BinaryOpNode(OpType::EQ, $1, $3); }
+    | expr NEQ expr { $$ = new BinaryOpNode(OpType::NEQ, $1, $3); }
     | expr GT expr  { $$ = new BinaryOpNode(OpType::GT, $1, $3); }
     | expr GTE expr { $$ = new BinaryOpNode(OpType::GTE, $1, $3); }
     | expr LT expr  { $$ = new BinaryOpNode(OpType::LT, $1, $3); }

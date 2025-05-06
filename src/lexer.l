@@ -35,8 +35,8 @@ extern int yylineno;
 "*"             { return '*'; }
 "/"             { return '/'; }
 
-"="             { return VAL_EQ; }
-"!="            { return VAL_NEQ; }
+"=="            { return EQ; }
+"!="            { return NEQ; }
 ">"             { return GT; }
 ">="            { return GTE; }
 "<"             { return LT; }

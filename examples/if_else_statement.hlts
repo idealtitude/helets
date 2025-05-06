@@ -2,7 +2,7 @@ int x: 5
 int y: 10
 int z: 0
 
-if x < y:
-    true
+if (x < y):
+    x: 1
 else:
     z: 2
