@@ -46,6 +46,6 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 cleanall: clean
-	rm -rf $(TARGET)
+	rm -rf $(BIN_DIR)/*
 
 .PHONY: all clean cleanall
